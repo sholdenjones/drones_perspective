@@ -1,0 +1,164 @@
+---
+title: "drones_process"
+author: "Holden Jones"
+date: "2026-02-04"
+output: html_document
+---
+
+#1. Load packages, data
+
+```{r}
+library(dplyr)
+library(tidyr)
+library(stringr)
+
+data <- read.csv("data/data_extraction.csv")
+```
+
+Only retain the columns required for figures and tables, rename columns
+```{r}
+cols_keep <- c("Study.ID", 
+               "Country.of.study",
+               "Country.of.first.author.s.affiliation",
+               "Climatic.zone",
+               "Ecosystem.Type",
+               "UAV.Platform.Type",
+               "Sensor.Type",
+               "Spatial.resolution",
+               "Spatial.extent",
+               "Research.topic"
+)
+
+data <- data %>%
+  select(all_of(cols_keep)) %>%
+  rename(
+    study_ID = Study.ID,
+    country_study = Country.of.study,
+    country_author = Country.of.first.author.s.affiliation,
+    climate = Climatic.zone,
+    ecosystem = Ecosystem.Type,
+    platform = UAV.Platform.Type,
+    sensor = Sensor.Type,
+    spatial_resolution = Spatial.resolution,
+    spatial_extent = Spatial.extent,
+    topic = Research.topic
+  )
+```
+
+
+#2. country_summary
+
+```{r}
+# Count studies by study location
+study_country_counts <- data %>%
+  separate_rows(country_study, sep = ",") %>%
+  mutate(country = str_trim(country_study)) %>%
+  distinct(study_ID, country) %>%
+  count(country, name = "n_studies_in_country")
+
+# Count studies by first author affiliation
+author_country_counts <- data %>%
+  separate_rows(country_author, sep = ",") %>%
+  mutate(country = str_trim(country_author)) %>%
+  distinct(study_ID, country) %>%
+  count(country, name = "n_studies_by_author_country")
+
+# Join into one table
+country_summary <- full_join(
+  study_country_counts,
+  author_country_counts,
+  by = "country"
+) %>%
+  replace_na(list(
+    n_studies_in_country = 0,
+    n_studies_by_author_country = 0
+  )) %>%
+  arrange(
+    desc(n_studies_in_country),
+    desc(n_studies_by_author_country)
+  )
+
+write.csv(
+  country_summary,
+  file = "output/country_summary.csv",
+  row.names = FALSE
+)
+```
+
+
+#3. ecosystem_type
+
+```{r}
+ecosystem_counts <- data %>%
+  separate_rows(ecosystem, sep = ",") %>%
+  mutate(ecosystem = str_trim(ecosystem)) %>%
+  distinct(study_ID, ecosystem) %>%
+  count(ecosystem, name = "n_studies") %>%
+  arrange(desc(n_studies))
+```
+
+
+#4. platform
+
+```{r}
+platform_counts <- data %>%
+  separate_rows(platform, sep = ",") %>%
+  mutate(platform = str_trim(platform)) %>%
+  filter(platform != "not reported") %>%    # remove 'not reported'
+  distinct(study_ID, platform) %>%
+  count(platform, name = "n_studies") %>%
+  arrange(desc(n_studies))
+```
+
+
+#5. sensor
+
+```{r}
+sensor_counts <- data %>%
+  separate_rows(sensor, sep = ",") %>%
+  mutate(sensor = str_trim(sensor)) %>%
+  filter(sensor != "not reported") %>% # remove not reported
+  distinct(study_ID, sensor) %>%
+  count(sensor, name = "n_studies") %>%
+  arrange(desc(n_studies))
+```
+
+
+#6. topic
+
+```{r}
+topic_counts <- data %>%
+  separate_rows(topic, sep = ",") %>%
+  mutate(topic = str_trim(topic)) %>%
+  filter(topic != "") %>%
+  distinct(study_ID, topic) %>%
+  count(topic, name = "n_studies") %>%
+  arrange(desc(n_studies))
+
+# fix misspellings
+topic_counts <- topic_counts %>%
+  mutate(topic = case_when(
+    topic %in% c("Plant physiological performance", 
+                 "Plany physiological performance") ~ 
+      "Plant physiological performance",
+    
+    topic %in% c("Carbon/nutrient fluxes", 
+                 "Carbon and nutrient fluxes") ~ 
+      "Carbon/nutrient fluxes",
+    
+    
+    TRUE ~ topic
+  )) %>%
+  group_by(topic) %>%
+  summarise(n_studies = sum(n_studies), .groups = "drop") %>%
+  arrange(desc(n_studies))
+```
+
+
+#7. spatial resolution distribution
+
+
+#8. spatial extent distribution
+
+
+
