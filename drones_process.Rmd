@@ -252,7 +252,27 @@ spatial_hist <- ggplot(spatial_data_no_ppm,
     y = "Count"
   ) +
   theme_minimal() +
+  theme(
+    axis.title = element_text(size = 16),
+    axis.text  = element_text(size = 14),
+    legend.title = element_text(size = 16),
+    legend.text  = element_text(size = 14)
+  ) +
   scale_fill_brewer(palette = "Set2")
+
+# increase space between title and axes
+spatial_hist <- spatial_hist +
+  theme(
+    axis.title.x = element_text(
+      size = 16,
+      margin = margin(t = 18)   # space above x title
+    ),
+    axis.title.y = element_text(
+      size = 16,
+      margin = margin(r = 18)   # space to right of y title
+    ),
+    axis.text = element_text(size = 14)
+  )
 
 spatial_hist
 
@@ -261,6 +281,50 @@ spatial_hist
 #   plot = spatial_hist, width = 8, height = 6, units = "in", dpi = 300)
 ```
 
+also make histogram for studies reporting raw LiDAR ppm resolution
+```{r}
+# make numeric
+spatial_data_ppm <- spatial_data_ppm %>%
+  mutate(spatial_resolution = as.numeric(spatial_resolution))
+
+spatial_hist_ppm <- ggplot(spatial_data_ppm, 
+                           aes(x = spatial_resolution)) +
+  geom_histogram(
+    position = "stack",
+    alpha = 0.7,
+    bins = 30,
+    fill = "#8DA0CB"
+  ) +
+  labs(
+    x = "LiDAR spatial resolution in points per meter",
+    y = "Count"
+  ) +
+  theme_minimal() +
+    theme(
+    axis.title = element_text(size = 16),
+    axis.text  = element_text(size = 14)
+  )
+
+# increase space between title and axes
+spatial_hist_ppm <- spatial_hist_ppm +
+  theme(
+    axis.title.x = element_text(
+      size = 16,
+      margin = margin(t = 18)   # space above x title
+    ),
+    axis.title.y = element_text(
+      size = 16,
+      margin = margin(r = 18)   # space to right of y title
+    ),
+    axis.text = element_text(size = 14)
+  )
+
+spatial_hist_ppm
+
+ggsave(
+  filename = "output/spatial_resolution_histogram_ppm.png",
+  plot = spatial_hist, width = 8, height = 6, units = "in", dpi = 300)
+```
 
 
 
