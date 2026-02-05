@@ -253,9 +253,9 @@ spatial_hist <- ggplot(spatial_data_no_ppm,
   ) +
   theme_minimal() +
   theme(
-    axis.title = element_text(size = 16),
+    axis.title = element_text(size = 18),
     axis.text  = element_text(size = 14),
-    legend.title = element_text(size = 16),
+    legend.title = element_text(size = 18),
     legend.text  = element_text(size = 14)
   ) +
   scale_fill_brewer(palette = "Set2")
@@ -277,7 +277,7 @@ spatial_hist <- spatial_hist +
 spatial_hist
 
 # ggsave(
-#   filename = "output/spatial_resolution_histogram.png",  
+#   filename = "output/spatial_resolution_histogram.png",
 #   plot = spatial_hist, width = 8, height = 6, units = "in", dpi = 300)
 ```
 
@@ -301,7 +301,7 @@ spatial_hist_ppm <- ggplot(spatial_data_ppm,
   ) +
   theme_minimal() +
     theme(
-    axis.title = element_text(size = 16),
+    axis.title = element_text(size = 18),
     axis.text  = element_text(size = 14)
   )
 
@@ -321,9 +321,9 @@ spatial_hist_ppm <- spatial_hist_ppm +
 
 spatial_hist_ppm
 
-ggsave(
-  filename = "output/spatial_resolution_histogram_ppm.png",
-  plot = spatial_hist, width = 8, height = 6, units = "in", dpi = 300)
+# ggsave(
+#   filename = "output/spatial_resolution_histogram_ppm.png",
+#   plot = spatial_hist, width = 8, height = 6, units = "in", dpi = 300)
 ```
 
 
