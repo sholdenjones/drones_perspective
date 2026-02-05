@@ -27,7 +27,7 @@ cols_keep <- c("Study.ID",
                "UAV.Platform.Type",
                "Sensor.Type",
                "spatial_resolution_clean",
-               "Spatial.extent",
+               "spatial_extent_clean",
                "Research.topic"
 )
 
@@ -42,7 +42,7 @@ data <- data %>%
     platform = UAV.Platform.Type,
     sensor = Sensor.Type,
     spatial_resolution = spatial_resolution_clean,
-    spatial_extent = Spatial.extent,
+    spatial_extent = spatial_extent_clean,
     topic = Research.topic
   )
 ```
@@ -323,12 +323,105 @@ spatial_hist_ppm
 
 # ggsave(
 #   filename = "output/spatial_resolution_histogram_ppm.png",
-#   plot = spatial_hist, width = 8, height = 6, units = "in", dpi = 300)
+#   plot = spatial_hist_ppm, width = 8, height = 6, units = "in", dpi = 300)
 ```
-
 
 
 #8. spatial extent distribution
 
+```{r}
+# Filter out empty or NA values, separate extent into units
+spatial_data_extent <- data %>%
+  filter(!is.na(spatial_extent), spatial_extent != "") %>%
+  separate(
+    col = spatial_extent,
+    into = c("spatial_extent", "extent_units"),
+    sep = " ",
+    convert = TRUE   # automatically converts numeric part to numeric
+  )
+```
 
+convert everything into ha, new column called extent_ha
+```{r}
+spatial_data_extent <- spatial_data_extent %>%
+  mutate(
+    extent_ha = case_when(
+      extent_units == "m2"  ~ spatial_extent / 10000,    # 1 ha = 10,000 m²
+      extent_units == "km2" ~ spatial_extent * 100,      # 1 km² = 100 ha
+      extent_units == "ha"  ~ spatial_extent,            # already in ha
+      TRUE ~ NA_real_                                           # catch any other units
+    )
+  )
+```
 
+make histogram without log scale axes
+```{r}
+# Create histogram for spatial extent in hectares
+spatial_extent_hist <- ggplot(spatial_data_extent, 
+                              aes(x = extent_ha)) +
+  geom_histogram(
+    position = "stack",
+    alpha = 0.7,
+    bins = 30) +
+  labs(
+    x = "Spatial extent (ha)",
+    y = "Count"
+  ) +
+  theme_minimal() +
+  theme(
+    axis.title = element_text(size = 18),
+    axis.text  = element_text(size = 14)
+  ) +
+  theme(
+    axis.title.x = element_text(
+      size = 16,
+      margin = margin(t = 18)   # space above x title
+    ),
+    axis.title.y = element_text(
+      size = 16,
+      margin = margin(r = 18)   # space to right of y title
+    ),
+    axis.text = element_text(size = 14)
+  )
+
+spatial_extent_hist
+# ggsave(
+#   filename = "output/spatial_extent_histogram.png",
+#   plot = spatial_extent_hist, width = 8, height = 6, units = "in", dpi = 300)
+```
+
+log scale, small constant shift of 1 to have log axes not be below 0
+```{r}
+spatial_extent_hist_log <- ggplot(spatial_data_extent, 
+                              aes(x = extent_ha + 1)) +
+  geom_histogram(
+    position = "stack",
+    alpha = 0.7,
+    bins = 30) +
+  scale_x_log10() +
+  labs(
+    x = "Spatial extent in hectares (log scale)",
+    y = "Count"
+  ) +
+  theme_minimal() +
+  theme(
+    axis.title = element_text(size = 18),
+    axis.text  = element_text(size = 14)
+  ) +
+  theme(
+    axis.title.x = element_text(
+      size = 16,
+      margin = margin(t = 18)   # space above x title
+    ),
+    axis.title.y = element_text(
+      size = 16,
+      margin = margin(r = 18)   # space to right of y title
+    ),
+    axis.text = element_text(size = 14)
+  )
+
+spatial_extent_hist_log
+# ggsave(
+#   filename = "output/log_spatial_extent_histogram.png",
+#   plot = spatial_extent_hist_log, width = 8, height = 6, units = "in", dpi = 300)
+```
