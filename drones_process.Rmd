@@ -11,6 +11,8 @@ output: html_document
 library(dplyr)
 library(tidyr)
 library(stringr)
+library(purrr)
+library(ggplot2)
 
 data <- read.csv("data/data_extraction.csv")
 ```
@@ -24,7 +26,7 @@ cols_keep <- c("Study.ID",
                "Ecosystem.Type",
                "UAV.Platform.Type",
                "Sensor.Type",
-               "Spatial.resolution",
+               "spatial_resolution_clean",
                "Spatial.extent",
                "Research.topic"
 )
@@ -39,14 +41,14 @@ data <- data %>%
     ecosystem = Ecosystem.Type,
     platform = UAV.Platform.Type,
     sensor = Sensor.Type,
-    spatial_resolution = Spatial.resolution,
+    spatial_resolution = spatial_resolution_clean,
     spatial_extent = Spatial.extent,
     topic = Research.topic
   )
 ```
 
 
-#2. country_summary
+#2. country_counts
 
 ```{r}
 # Count studies by study location
@@ -64,7 +66,7 @@ author_country_counts <- data %>%
   count(country, name = "n_studies_by_author_country")
 
 # Join into one table
-country_summary <- full_join(
+country_counts <- full_join(
   study_country_counts,
   author_country_counts,
   by = "country"
@@ -78,15 +80,13 @@ country_summary <- full_join(
     desc(n_studies_by_author_country)
   )
 
-write.csv(
-  country_summary,
-  file = "output/country_summary.csv",
-  row.names = FALSE
-)
+# write.csv(country_counts,
+#           file = "output/country_counts.csv",
+#           row.names = FALSE)
 ```
 
 
-#3. ecosystem_type
+#3. ecosystem_counts
 
 ```{r}
 ecosystem_counts <- data %>%
@@ -95,10 +95,14 @@ ecosystem_counts <- data %>%
   distinct(study_ID, ecosystem) %>%
   count(ecosystem, name = "n_studies") %>%
   arrange(desc(n_studies))
+
+# write.csv(ecosystem_counts,
+#           file = "output/ecosystem_counts.csv",
+#           row.names = FALSE)
 ```
 
 
-#4. platform
+#4. platform_counts
 
 ```{r}
 platform_counts <- data %>%
@@ -108,10 +112,14 @@ platform_counts <- data %>%
   distinct(study_ID, platform) %>%
   count(platform, name = "n_studies") %>%
   arrange(desc(n_studies))
+
+# write.csv(platform_counts,
+#           file = "output/platform_counts.csv",
+#           row.names = FALSE)
 ```
 
 
-#5. sensor
+#5. sensor_counts
 
 ```{r}
 sensor_counts <- data %>%
@@ -121,10 +129,14 @@ sensor_counts <- data %>%
   distinct(study_ID, sensor) %>%
   count(sensor, name = "n_studies") %>%
   arrange(desc(n_studies))
+
+# write.csv(sensor_counts,
+#           file = "output/sensor_counts.csv",
+#           row.names = FALSE)
 ```
 
 
-#6. topic
+#6. topic_counts
 
 ```{r}
 topic_counts <- data %>%
@@ -141,21 +153,115 @@ topic_counts <- topic_counts %>%
     topic %in% c("Plant physiological performance", 
                  "Plany physiological performance") ~ 
       "Plant physiological performance",
-    
     topic %in% c("Carbon/nutrient fluxes", 
                  "Carbon and nutrient fluxes") ~ 
       "Carbon/nutrient fluxes",
-    
-    
     TRUE ~ topic
   )) %>%
   group_by(topic) %>%
   summarise(n_studies = sum(n_studies), .groups = "drop") %>%
   arrange(desc(n_studies))
+
+# write.csv(topic_counts,
+#           file = "output/topic_counts.csv",
+#           row.names = FALSE)
 ```
 
 
 #7. spatial resolution distribution
+
+spatial resolution data was not provided for many studies - remove these
+```{r}
+spatial_data <- data %>%
+  filter(!is.na(spatial_resolution),
+         spatial_resolution != "")
+```
+
+this is a critical step
+- separates rows with multiple sensors, resolutions by columns
+  maintaining the order of each, which is extremely important
+```{r}
+spatial_data <- spatial_data %>%
+  mutate(
+    sensor = str_split(sensor, ","),
+    spatial_resolution = str_split(spatial_resolution, ",")
+  ) %>%
+  mutate(
+    paired = map2(sensor, spatial_resolution, \(s, r) {
+      s <- str_trim(s)
+      r <- str_trim(r)
+
+      n <- max(length(s), length(r))
+      s <- c(s, rep(NA, n - length(s)))
+      r <- c(r, rep(NA, n - length(r)))
+
+      tibble(sensor = s, spatial_resolution = r)
+    })
+  ) %>%
+  select(-sensor, -spatial_resolution) %>%
+  unnest(paired)
+```
+
+remove straggler NAs, empty values
+```{r}
+spatial_data <- spatial_data %>%
+  filter(
+    !is.na(spatial_resolution),
+    spatial_resolution != "",
+    str_to_upper(str_trim(spatial_resolution)) != "NA"
+  )
+```
+
+split spatial_resolution again, make a units column
+```{r}
+spatial_data <- spatial_data %>%
+  separate(
+    spatial_resolution,
+    into = c("spatial_resolution", "resolution_units"),
+    sep = "\\s+",
+    extra = "merge",
+    fill = "right"
+  )
+```
+
+some LiDAR studies report resolution in pixels, others in raw data
+- for now remove ppm (points per meter), this comes from raw LiDAR clouds
+- make two separate dfs with and without ppm
+```{r}
+spatial_data_no_ppm <- spatial_data %>%
+  filter(!str_to_lower(resolution_units) %in% "ppm")
+
+# and here making a separate df just with ppm
+spatial_data_ppm <- spatial_data %>%
+  filter(str_to_lower(resolution_units) == "ppm")
+```
+
+histogram colored and stacked by sensor type
+```{r}
+# make numeric, capitalize sensor column for histogram
+spatial_data_no_ppm <- spatial_data_no_ppm %>%
+  mutate(spatial_resolution = as.numeric(spatial_resolution)) %>%
+  rename(Sensor = sensor)
+  
+spatial_hist <- ggplot(spatial_data_no_ppm, 
+                       aes(x = spatial_resolution, fill = Sensor)) +
+  geom_histogram(position = "stack", alpha = 0.7, bins = 30) +
+  scale_x_log10() +
+  labs(
+    x = "Spatial resolution in meters (log scale)",
+    y = "Count"
+  ) +
+  theme_minimal() +
+  scale_fill_brewer(palette = "Set2")
+
+spatial_hist
+
+# ggsave(
+#   filename = "output/spatial_resolution_histogram.png",  
+#   plot = spatial_hist, width = 8, height = 6, units = "in", dpi = 300)
+```
+
+
 
 
 #8. spatial extent distribution
