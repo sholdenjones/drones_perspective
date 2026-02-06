@@ -1,0 +1,137 @@
+study_id,year,country,study_site,sensor_type,research_topic,coord_lat,coord_lon,coord_method,coord_is_midpoint
+172,2024,Cameroon,Dja Faunal Reserve,LiDAR,Animal ecology,3.183333333333333,12.8,parsed,FALSE
+1,2020,Brazil,Estac ̧ão Experimental de Silvicultura Tropical,RGB,Forest structure/dynamics,-10.639048767332678,-53.21573392374128,centroid,FALSE
+96,2024,Mexico,Los Arboles Tulum,"RGB, Thermal","Animal ecology, Animal identification",20.297222222222224,-87.51638888888888,parsed,FALSE
+134,2023,Nigeria,Omo Forest Reserve,RGB,Forest structure/dynamics,9.590945570096185,8.079586854238343,centroid,FALSE
+63,2025,Mauritius,"Balfour Garden, Gorges Viewpoint and Grand Bassin","RGB, Thermal","Animal identification, Animal ecology",-0.25,57.583333333333336,parsed,FALSE
+158,2022,USA,Howland research forest northeast of Bangor in the U.S. state of Maine; Lope National Park located in central Gabon,LiDAR,Forest structure/dynamics,45.17166666666667,-68.57277777777777,parsed,TRUE
+35,2016,Malawi,Muyobe community forest reserve,RGB,Forest structure/dynamics,-11.5833,34.0833,existing,FALSE
+193,2025,Panama,"Matusagaratí  complex  of  wetlands,  in  Darien  Province,  Pacific  Panama",RGB,NA,8.1694,-77.8981,existing,FALSE
+155,2021,Malaysia,"southeast Sabah, Malaysia","RGB, LiDAR",Animal ecology,4.763595,117.24689,parsed,FALSE
+9,2021,Brazil,Acre state (private property near Rio Branco),RGB,Forest structure/dynamics,-9.986111,-68.1925,existing,TRUE
+10,2025,Brazil,Sergipe state,RGB,"Forest structure/dynamics, Carbon and nutrient fluxes",-11.0125,-37.258333,existing,TRUE
+14,2021,Vietnam,Ngoc Linh Nature Reserve,RGB,"Phenology, Forest structure/dynamics",15.098276,107.905771,existing,FALSE
+24,2023,Brazil,State of Rondônia,RGB,Forest structure/dynamics,-10.945616,-62.840904,existing,FALSE
+41,2022,Brazil,Rio Negro River (near Manaus),Atmospheric sampler,Carbon and nutrient fluxes,-3.0708,-60.3604,existing,FALSE
+44,2021,Costa Rica,"Arenal, Turrialba-Irazú, Cervantes lava flow, Reventado river",RGB,"Forest structure/dynamics, Animal ecology",10,-84,existing,FALSE
+46,2019,Brazil,Adolfo Ducke Forest Reserve (Manaus),Atmospheric sampler,Carbon and nutrient fluxes,-3.003,-59.9333,existing,FALSE
+50,2016,Brazil,Ponte Branca (Brazil),"Hyperspectral, RGB",Forest structure/dynamics,19.473472,-13.706389,existing,TRUE
+54,2020,Vietnam,Ngoc Linh Nature Reserve,RGB,Phenology,15.098131,107.905127,existing,FALSE
+64,2019,Brazil,Adolfo Ducke Forest Reserve (Manaus),Atmospheric sampler,Carbon and nutrient fluxes,-3,-59.938,existing,TRUE
+67,2019,Brazil,Manaus (Urban area surrounded by forest),Atmospheric sampler,Carbon and nutrient fluxes,-3.0918,-60.0175,existing,FALSE
+73,2020,Malaysia,"Ulu Jelai Forest Reserve, Pahang",RGB,Forest structure/dynamics,4.573658,101.873633,existing,FALSE
+75,2017,Costa Rica,Firestone Center for Restoration Ecology (FCRE),RGB,Forest structure/dynamics,9.278345,-83.861118,existing,FALSE
+81,2020,Brazil,"Secondary Atlantic Forest fragment (São Cristóvão, SE)",RGB,Forest structure/dynamics,-10.916667,-37.183333,existing,FALSE
+85,2018,Ghana,"Ankasa Conservation Area, Bobiri Forest Reserve, Kogyae Strict Nature Reserve",Hyperspectral,Carbon and nutrient fluxes,6.420066666666666,-1.7331,existing,TRUE
+87,2022,Cameroon,Mpem & Djim National Park,LiDAR,"Forest structure/dynamics, Carbon and nutrient fluxes",5.163078,11.745071,existing,FALSE
+93,2022,Mexico,Marismas Nacionales (Isla Palma),RGB,Forest structure/dynamics,22.622545,-105.668938,existing,FALSE
+103,2021,Brazil,Adolfo Ducke Forest Reserve (Manaus),Atmospheric sampler,Carbon and nutrient fluxes,-3,-59.938,existing,TRUE
+105,2019,Brazil,Ponte Branca (Brazil),"Hyperspectral, RGB",Forest structure/dynamics,-22.414167,-52.513889,existing,FALSE
+110,2023,Malaysia,Ulu Jelai Forest Reserve (Pahang),RGB,Carbon and nutrient fluxes,4.573658,101.873633,existing,FALSE
+115,2024,Costa Rica,"Golfo Dulce Forest Reserve (RFGD), Amistosa Biological Corridor (CBA)",RGB,Forest structure/dynamics,7.95173625,-83.26097200000001,existing,TRUE
+121,2024,Brazil,Cardoso Island State Park (Cananéia São Paulo),"RGB, Multispectral",Forest structure/dynamics,-25.13348,-47.941856,existing,FALSE
+130,2025,China,"Diaoluoshan forest park, Qingpilin reserve, Fengmu forest farm",LiDAR,"Forest structure/dynamics, Carbon and nutrient fluxes",18.701613,109.878233,existing,FALSE
+135,2025,United States of America; Hawaii,"Upper Waiākea Forest Reserve, Olaʻa Forest Reserve, Keaʻau",RGB,"Forest structure/dynamics, Canopy composition",19.615101,-155.274925,existing,FALSE
+151,2021,Costa Rica,La Selva Biological Station,LiDAR,"Forest structure/dynamics, Carbon and nutrient fluxes",10.433333,-83.983333,existing,TRUE
+156,2021,French Guiana,Paracou research station,"RGB, Multispectral, LiDAR","Phenology, Forest structure/dynamics",5.274582,-52.924585,existing,FALSE
+161,2020,Guatemala,"Comapa, Jutiapa (Anonito, Ixcanal II, San Ramon, El Naranjo)",RGB,"Animal ecology, Forest structure/dynamics",14.273234,-89.87898,existing,FALSE
+167,2023,Colombia,"Utría National Park (La Chunga North, Terron Colorado, Estero Grande Shore)",RGB,Forest structure/dynamics,6.018038,-77.345917,existing,FALSE
+169,2023,Cameroon,Southeastern Cameroon (Pallisco-CIFM concessions),RGB,Forest structure/dynamics,3.316253,14.34324,existing,TRUE
+173,2022,Malaysia,Deramakot and Tangkulap Forest Reserves,RGB,"Forest structure/dynamics, Canopy composition",5.3791667499999996,117.3791665,existing,TRUE
+174,2023,Colombia,Amacayacu Forest Dynamics Plot (AFDP),NIR,"Forest structure/dynamics, Plant physiological performance",-3.809167,-70.267778,existing,TRUE
+176,2019,Indonesia,Sebangau National Park (Central Kalimantan),RGB,"Forest structure/dynamics, Carbon and nutrient fluxes",-2.597376,113.673434,existing,FALSE
+180,2023,French Guiana,Paracou Research Station,LiDAR,Forest structure/dynamics,5.3,-52.883333,existing,TRUE
+185,2024,Costa Rica,"Cerro Vueltas, Cordillera de Talamanca",RGB,Animal ecology,9.621111,-83.858333,existing,TRUE
+186,2022,Kenya,West Pokot County (Pokot Central),RGB,"Forest structure/dynamics, Carbon and nutrient fluxes",1.667795,35.474761,existing,FALSE
+189,2019,Costa Rica,Hacienda Barú National Wildlife Refuge,Multispectral,"Phenology, Forest structure/dynamics",9.25,-84.233333,existing,TRUE
+191,2019,Malawi,"Mpherembe traditional authority, Mzimba district, northern Malawi","RGB, NIR","Forest structure/dynamics, Carbon and nutrient fluxes",-11.583333,33.65,existing,FALSE
+197,2024,Brazil,"Capão da Engenharia Florestal, near Curitiba, Paraná state","RGB, LiDAR",Forest structure/dynamics,-25.45,-49.233333,existing,FALSE
+198,2021,French Guiana,Paracou Research Station,LiDAR,Forest structure/dynamics,5.27408,-52.92318,existing,FALSE
+202,2024,Suriname,"Botopasi village, Sipaliwini district",RGB,"Forest structure/dynamics, Canopy composition",4.216667,-55.45,existing,FALSE
+219,2024,"Portugal, Palau, USA (Hawaii)","Madeira (Portugal), Palau, Hawaii (USA)",RGB,"Canopy composition, Plant physiological performance",39.60621030811329,-8.528130281259454,centroid,FALSE
+220,2021,Brazil,"Curitibanos municipality, Santa Catarina state (UFSC experimental farm)",Hyperspectral,"Canopy composition, Forest structure/dynamics",-27.283333,-50.583333,existing,FALSE
+199,2022,Costa Rica,Osa Peninsula,LiDAR,Animal identification,8.40388,-83.33661,parsed,FALSE
+217,2025,Cameroon,Dja Faunal Reserve,RGB,Animal ecology,3.183333333333333,12.8,parsed,FALSE
+210,2022,Mexico,Four areas in Yucatan peninsula,RGB,Animal identification,20.85,-86.88333333333334,parsed,FALSE
+126,2021,"Gabon, Peru","Communidad Nativa Bélgica (Peru), logging concession operated by Rougier Gabon (Gabon)","RGB, LiDAR",Forest structure/dynamics,-11.01,-69.73,parsed,FALSE
+203,2023,China,Bawangling National Nature Reserve,"RGB, Thermal",Animal identification,36.69140669345149,103.37804953979274,centroid,FALSE
+23,2025,Brazil,Forest restoration in Pontal do Paranapanema,LiDAR,"Forest structure/dynamics, Restoration monitoring, Carbon and nutrient fluxes",-22.666666666666668,-52.27333333333333,parsed,FALSE
+7,2019,Malaysia,Danum Valley Conservation Area and Sepilok Forest Reserve,RGB,Forest structure/dynamics,5.4083334999999995,117.8166665,existing,TRUE
+12,2020,Costa Rica,"Sarapiquí, Heredia Province, iCaribbean lowlands (50–220 m a.s.l.) of northeastern Costa Rica",LiDAR,Forest structure/dynamics,10.5,-84,parsed,FALSE
+13,2023,Brazil,"Morro da Pedreira Environmental Protection Area, Brazil",RGB,Forest structure/dynamics,-19.566666666666666,43.45,parsed,FALSE
+16,2020,Peru,"Loreto, Peru",RGB,Canopy composition,-12.0359941,-77.088121,geocoded,FALSE
+17,2022,China,"Diaoluo Mountain National Forest Park in Hainan, China","RGB, LiDAR, Multispectral",Canopy composition,18.633333333333333,110.06666666666666,parsed,FALSE
+40,2020,China,Hainan Bawangling National Forest Park,LiDAR,Forest structure/dynamics,19.083333333333332,110.88333333333334,parsed,FALSE
+133,2025,Malaysia,"Lower Kinabatangan Wildlife Sanctuary, Sabah, Malaysia",RGB,"Carbon and nutrient fluxes, Restoration monitoring",5.420833333333333,117.96805555555555,parsed,FALSE
+192,2025,Colombia,"El Cocuy National Natural Park, Colombia",LiDAR,Carbon and nutrient fluxes,72.33333333333333,6.366666666666666,parsed,FALSE
+32,2019,Indonesia,"Hutan Harapan, Sumatra, Indonesia",RGB,"Forest structure/dynamics, Carbon and nutrient fluxes",-2.2640678135827788,117.17972980513929,centroid,FALSE
+5,2018,Guyana,tropical forest south of Bartica,RGB,Forest structure/dynamics,6820100,-588410550,parsed,FALSE
+88,2012,Indonesia,"Gunung Leuser National Park, Sumatra, Indonesia",RGB,Methodological advancement,3.966666666666667,98.08333333333333,parsed,FALSE
+28,2022,Indonesia,Sikundur Reserve,RGB,"Forest structure/dynamics, Forest microclimate",3.95,-98.07,parsed,FALSE
+70,2021,China,Diaoluoshan National Forest Park,LiDAR,Forest structure/dynamics,19,110,parsed,FALSE
+79,2015,Malaysia,"Lower Kinabatangan Wildlife Sanctuary, Sabah, Malaysia",RGB,"Animal ecology, Animal identification",5.423742,118.055597,parsed,FALSE
+21,2018,Indonesia,Sikundur,RGB,"Animal ecology, Forest structure/dynamics",3.96,98.07,parsed,TRUE
+59,2021,Democratic Republic of Congo,"Yangambi Biosphere Reserve, Yoko Reserve",RGB,"Forest structure/dynamics, Methodological advancement",-2,22,parsed,FALSE
+125,2022,Australia,"Oliver Creek, Robson Creek, Queensland",LiDAR,"Forest structure/dynamics, Methodological advancement",-25.764181552307925,134.30382912393384,centroid,FALSE
+153,2024,Honduras,"Mixed land uses across Utila, Honduras",RGB,"Animal ecology, Forest structure/dynamics, Forest microclimate",16.095,-86.9274,parsed,FALSE
+190,2022,"Germany, Netherlands",Paracou Research Station,LiDAR,"Forest structure/dynamics, Methodological advancement",5.3,-52.88333333333333,parsed,FALSE
+102,2021,Belgium,Litchfield Savanna SuperSite,LiDAR,"Animal ecology, Animal identification",50.638894963112655,4.645938194702396,centroid,FALSE
+26,2021,China,Yongzhuang Reservoir in Haikou City,RGB,"Forest structure/dynamics, Restoration monitoring, Methodological advancement",19.9649,110.2579,parsed,FALSE
+29,2019,Taiwan,"Lienhuachih Experimental Station, Taiwan","LiDAR, RGB","Forest structure/dynamics, Phenology",23.915,120.88,parsed,FALSE
+38,2019,Costa Rica,"Santa Rosa National Park Environmental Monitoring Super Site (SRNP-EMSS), Guanacaste Province","Thermal, Multispectral","Plant physiological performance, Forest microclimate",10.8333,-85.7,existing,FALSE
+42,2020,Brazil,"Euclides da Cunha Paulista, countryside of São Paulo State, Brazil",Hyperspectral,"Forest structure/dynamics, Canopy composition",-22.56139,-52.59028,existing,FALSE
+45,2018,Costa Rica,"Santa Rosa National Park Environmental Monitoring Super Site, Guanacaste, Costa Rica.",Multispectral,Forest structure/dynamics,10.81472,-85.615,existing,FALSE
+52,2020,Brazil,"Rio Capim Forest Estate (RCFE), Paragominas municipality, Pará, Brazil",RGB,"Forest structure/dynamics, Canopy composition",-3.65778,-48.83333,existing,FALSE
+55,2022,Malaysia,Danum Valley Conservation Area,RGB,"Canopy composition, Forest structure/dynamics",4.95,117.7,existing,FALSE
+61,2025,China,"Limu Mountain (Qiongzhong Li and Miao Autonomous County) and Diaoluo Mountain (Lingshui County), central Hainan Province, China","Hyperspectral, LiDAR",Carbon and nutrient fluxes,19.116666666666667,109.8,parsed,TRUE
+62,2021,Brazil,"Anhembi-SP, southeastern Brazil","LiDAR, Hyperspectral, Multispectral",Forest structure/dynamics,-22.75,-48.11,parsed,FALSE
+68,2019,Brazil,"Anhembi-SP, southeastern Brazil",LiDAR,Forest structure/dynamics,-22.75,-48.11,parsed,FALSE
+76,2019,Brazil,"Curitibanos municipality, Santa Catarina state","Hyperspectral, RGB",Forest structure/dynamics,-27.28278,-50.58444,existing,FALSE
+77,2020,Brazil,"Seringal Filipinas community, Chico Mendes Extractive Reserve",LiDAR,Forest structure/dynamics,-10.78672,-68.66565,existing,FALSE
+78,2020,Brazil,"Euclides da Cunha Paulista, western part of São Paulo State, Brazil",Hyperspectral,Forest structure/dynamics,-22.56139,-52.59028,existing,FALSE
+82,2023,Brazil,"Botanic Garden of Brasília (JBB), Federal District, Brazil (within the Gama-Cabeça-de-Veado protected area).","RGB, Multispectral, Thermal",Forest structure/dynamics,-15.87986,-47.85358,existing,FALSE
+83,2020,China,"Bawangling (BWL) National Forest Park and Diaoluoshan (DLS) National Forest Park, Hainan Province, China.","Multispectral, LiDAR",Forest structure/dynamics,36.69140669345149,103.37804953979274,centroid,FALSE
+101,2024,Benin,"Ewe-Adakplame Relict Forest (EARF), Ketou District, southeastern Benin, West Africa","Multispectral, LiDAR",Forest structure/dynamics,7.466443,2.574832,existing,FALSE
+104,2024,China,"Diaoluo Mountain (Lingshui County) and Limu Mountain (Qiongzhong County), Hainan Province, China","Hyperspectral, LiDAR","Carbon and nutrient fluxes, Forest structure/dynamics",19.116666666666667,109.8,parsed,TRUE
+116,2025,Costa Rica,"Estación Experimental Forestal Horizontes (Área de Conservación Guanacaste), northwest Costa Rica","Thermal, RGB",Plant physiological performance,10.71278,-85.59611,existing,FALSE
+124,2023,Brazil,Atlantic Forest and Cerrado in southeastern Brazil,LiDAR,Forest structure/dynamics,-10.639048767332678,-53.21573392374128,centroid,FALSE
+128,2023,Thailand,"Chiang Mai University’s Forest Restoration Research Unit, Thailand",RGB,Forest structure/dynamics,18.85611,98.84917,existing,FALSE
+129,2020,Costa Rica,"La Selva Biological Station, Costa Rica",LiDAR,Methodological advancement,10.43333,-83.98333,existing,FALSE
+140,2023,China,"tropical seasonal rain forests of Yunnan Province, China",LiDAR,Forest structure/dynamics,21.93,101.0875,existing,TRUE
+145,2021,Panama,"Barro Colorado Island, Panama",RGB,"Forest structure/dynamics, Canopy composition",9.15,-79.83,existing,FALSE
+163,2024,Cameroon,"Dja Faunal Reserve, Cameroon",LiDAR,Animal ecology,5.681168003162888,12.733943967668148,centroid,FALSE
+171,2020,Colombia,"Parque Ecológico Matarredonda, eastern range of the Colombian Andes, Columbia","RGB, Hyperspectral","Forest structure/dynamics, Canopy composition",4.560583333333333,-74.00202777777778,parsed,TRUE
+178,2022,Republic of Congo,"Loundoungou site, Likouala province","RGB, Multispectral, LiDAR","Forest structure/dynamics, Forest cover detection",2.4532972222222225,17.042269444444447,parsed,TRUE
+200,2021,Indonesia,"Jambi Province, Sumatra, Indonesia","RGB, NIR","Forest structure/dynamics, Canopy composition",-1.95,103.25,parsed,TRUE
+205,2025,China,"Zhanjiang Mangrove National Nature Reserve, China",Multispectral,Forest structure/dynamics,64.95,66.0833,existing,TRUE
+206,2025,Peru,"National Service of Protected Areas – SERNANP, Loreto, Peru",RGB,Forest structure/dynamics,-9.107149627259435,-74.42074158947496,centroid,FALSE
+211,2022,China,"Guangxi Zhuang Autonomous Region, China","RGB, Multispectral",Forest structure/dynamics,21.61722222222222,108.87138888888889,parsed,TRUE
+218,2025,China,"Shajiao Mangrove Nature Reserve, China",LiDAR,Forest structure/dynamics,21.6375,108.84916666666666,parsed,TRUE
+35,2016,Malawi,"Muyobe forest reserve, Malawi",RGB,Forest structure/dynamics,-11.35,33.65,existing,FALSE
+117,2021,USA,"Ciénaga Las Cucharillas natural reserve (San Juan Bay), northern metropolitan area of Puerto Rico",RGB,"Forest structure/dynamics, Restoration monitoring",18.440353000000002,-66.135664,existing,FALSE
+141,2017,Australia,Robson Creek tropical forest in Australia,RGB,"Forest structure/dynamics, Restoration monitoring",-25.764181552307925,134.30382912393384,centroid,FALSE
+147,2022,Ecuador,central coastal region of Ecuador,RGB,Forest structure/dynamics,-1.4241098516535668,-78.74929831943139,centroid,FALSE
+193,2025,Panama,"Matusagaratí complex of wetlands, in Darien Province, Pacific Panama",RGB,Forest structure/dynamics,8.520232994959372,-80.11877624020535,centroid,FALSE
+216,2024,China,"Hengqin, the southern – China Great Bay Area, China",LiDAR,Forest structure/dynamics,36.69140669345149,103.37804953979274,centroid,FALSE
+166,2022,Indonesia,"Pulau Rambut Wildlife Sanctuary, Baluran National Park,  Gunung Halimun Salak National Park","RGB, Thermal",Animal identification,-5.9750000000000005,-74.16452777777778,parsed,FALSE
+69,2019,Ghana,Ankasa Conservation Area,"LiDAR, RGB",Forest structure/dynamics,7.947699712584651,-1.216989640433258,centroid,FALSE
+36,2017,Ecuador,Cuyabeno National Park,RGB,"Methodological advancement, Forest cover detection",-0.27,-75.875,parsed,FALSE
+6,2020,Costa Rica,Santa Rosa National Park Environmental Monitoring Super-Site,"Multispectral, Thermal",Forest microclimate,9.976131265055049,-84.18986953318536,centroid,FALSE
+137,2023,Indonesia,Harapan rainforest,Thermal,"Carbon and nutrient fluxes, Plant physiological performance",-2.23333,103.31667,parsed,FALSE
+132,2023,Brazil,Ponte Branca,"LiDAR, Hyperspectral, RGB",Plant identification,-22.416666666666668,-52.05,parsed,FALSE
+139,2024,Ecuador,FCAT Reserve,RGB,Plant identification,0.39111111111111113,-79.68472222222222,parsed,FALSE
+170,2023,Brazil,"Wind-Tree Interaction in the Amazon, and Amazon Tall Tower Observatory",RGB,Forest structure/dynamics,-2.6130555555555555,-60.14472222222222,parsed,TRUE
+80,2020,Indonesia,Harapan rainforest,RGB,Plant physiological performance,-2.2640678135827788,117.17972980513929,centroid,FALSE
+122,2022,Panama,Barro Colorado Island,RGB,Forest structure/dynamics,9.156081,-79.8449786,geocoded,FALSE
+97,2024,Indonesia,Harapan rainforest,"Thermal, RGB",Plant physiological performance,-2.5,102.5,parsed,FALSE
+144,2023,Panama,Barro Colorado Island,RGB,Phenology,9.15333388888889,-79.85069194444443,parsed,FALSE
+11,2019,Panama,Barro Colorado Island,RGB,Phenology,9.15333388888889,-79.85069194444443,parsed,FALSE
+118,2020,Brazil,experimental forest of Brazilian Agricultural Research Company,RGB,Plant identification,-10.022777777777778,-67.6675,parsed,FALSE
+98,2020,Costa Rica,Santa Rosa National Park Environmental Monitoring Super Site,Multispectral,"Forest structure/dynamics, Canopy composition",10.85,-85.625,parsed,FALSE
+95,2023,Indonesia,Bukit Tigapuluh Landscape,"RGB, Thermal","Animal identification, Animal ecology",-1.0743666666666667,102.51219166666667,parsed,FALSE
+136,2022,Colombia,forest fragment of 60 ha in Colombian Chocó,"RGB, Multispectral",Forest structure/dynamics,7.9,-76.6,parsed,TRUE
+22,2025,Costa Rica,Estación Experimental Forestal Horizontes,"RGB, Thermal, Multispectral","Forest microclimate, Plant physiological performance",85.5,10.5,parsed,TRUE
+37,2019,Ecuador,Estación Científica San Francisco,"RGB, Multispectral",Forest structure/dynamics,-3.9716666666666667,79.07916666666667,parsed,FALSE
+49,2022,Malaysia,Ulu Jelai Forest Reserve,RGB,"Carbon and nutrient fluxes, Forest structure/dynamics",3.5666666666666664,101.86666666666666,parsed,FALSE
+131,2020,Malaysia,Tanjung Piai Forest Reserve,not reported,Forest cover detection,3.811140433067241,109.69934297070633,centroid,FALSE
+15,2019,Myanmar,Pyinde Reserved Forest,RGB,Forest structure/dynamics,21.112906888883472,96.49475560405618,centroid,FALSE
