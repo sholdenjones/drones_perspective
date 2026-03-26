@@ -236,12 +236,34 @@ spatial_data_ppm <- spatial_data %>%
   filter(str_to_lower(resolution_units) == "ppm")
 ```
 
+prep spatial_data_no_ppm for histogram
+```{r}
+# define sensor order for stacking bars, legend
+sensor_order <- c("Atmospheric", "LiDAR", "Thermal", "Hyperspectral", "NIR", 
+                  "Multispectral", "RGB")
+
+# ensure sensor matches sensor_order
+spatial_data_no_ppm <- spatial_data_no_ppm %>%
+  mutate(
+    sensor = case_when(
+      sensor == "Atmospheric sampler" ~ "Atmospheric",
+      TRUE ~ sensor
+    )
+  )
+
+spatial_data_no_ppm <- spatial_data_no_ppm %>%
+  mutate(
+    spatial_resolution = as.numeric(spatial_resolution),
+    Sensor = factor(tools::toTitleCase(sensor), levels = sensor_order)
+  ) %>%
+  select(-sensor)
+```
+
 histogram colored and stacked by sensor type
 ```{r}
 # make numeric, capitalize sensor column for histogram
 spatial_data_no_ppm <- spatial_data_no_ppm %>%
-  mutate(spatial_resolution = as.numeric(spatial_resolution)) %>%
-  rename(Sensor = sensor)
+  mutate(spatial_resolution = as.numeric(spatial_resolution))
   
 spatial_hist <- ggplot(spatial_data_no_ppm, 
                        aes(x = spatial_resolution, fill = Sensor)) +
@@ -279,6 +301,49 @@ spatial_hist
 # ggsave(
 #   filename = "output/spatial_resolution_histogram.png",
 #   plot = spatial_hist, width = 8, height = 6, units = "in", dpi = 300)
+```
+
+faceted hist with optical and non-optical sensors
+```{r}
+spatial_data_no_ppm <- spatial_data_no_ppm %>%
+  mutate(
+    SensorGroup = case_when(
+      Sensor %in% c("RGB", "Multispectral", "NIR", "Hyperspectral") ~ "Optical",
+      Sensor %in% c("LiDAR", "Thermal", "Atmospheric") ~ "Non-optical",
+      TRUE ~ NA_character_
+    )
+  )
+```
+
+
+```{r}
+spatial_hist_facet <- ggplot(spatial_data_no_ppm, 
+                       aes(x = spatial_resolution, fill = Sensor)) +
+  geom_histogram(position = "stack", alpha = 0.7, bins = 30) +
+  scale_x_log10() +
+  facet_wrap(~SensorGroup, nrow = 2) +
+  scale_fill_brewer(palette = "Set2", drop = FALSE) +
+  labs(
+    x = "Spatial resolution in meters (log scale)",
+    y = "Count",
+    fill = "Sensor Type"
+  ) +
+  theme_minimal() +
+  theme(
+    strip.text = element_text(size = 18),
+    axis.title = element_text(size = 18),
+    axis.text  = element_text(size = 14),
+    legend.title = element_text(size = 18),
+    legend.text  = element_text(size = 14),
+    axis.title.x = element_text(margin = margin(t = 18)),
+    axis.title.y = element_text(margin = margin(r = 18))
+  )
+
+spatial_hist_facet
+
+# ggsave(
+#   filename = "output/spatial_resolution_histogram_faceted.png",
+#   plot = spatial_hist_facet, width = 8, height = 6, units = "in", dpi = 300)
 ```
 
 also make histogram for studies reporting raw LiDAR ppm resolution
@@ -425,3 +490,72 @@ spatial_extent_hist_log
 #   filename = "output/log_spatial_extent_histogram.png",
 #   plot = spatial_extent_hist_log, width = 8, height = 6, units = "in", dpi = 300)
 ```
+
+
+#9. extent vs. resolution scatterplot
+
+## working - figure to explore relationship between spatial extent and resolution
+
+start with spatial_data_no_ppm
+- convert spatial_extent to hectares as above
+```{r}
+spatial_scatterplot <- spatial_data_no_ppm %>%
+  filter(!is.na(spatial_extent), spatial_extent != "") %>%
+  separate(
+    col = spatial_extent,
+    into = c("spatial_extent", "extent_units"),
+    sep = " ",
+    convert = TRUE   # automatically converts numeric part to numeric
+  )
+
+# convert all extent into ha
+spatial_scatterplot <- spatial_scatterplot %>%
+  mutate(
+    extent_ha = case_when(
+      extent_units == "m2"  ~ spatial_extent / 10000,    # 1 ha = 10,000 m²
+      extent_units == "km2" ~ spatial_extent * 100,      # 1 km² = 100 ha
+      extent_units == "ha"  ~ spatial_extent,            # already in ha
+      TRUE ~ NA_real_                                           # catch any other units
+    )
+  )
+
+# update sensor order - no atmospheric
+sensor_order_2 <- c("LiDAR", "Thermal", "Hyperspectral", "NIR", 
+                  "Multispectral", "RGB")
+
+spatial_scatterplot <- spatial_scatterplot %>%
+  mutate(
+    Sensor = factor(Sensor, levels = sensor_order_2)
+  )
+```
+
+```{r}
+spatial_scatter <- ggplot(
+  spatial_scatterplot,
+  aes(x = extent_ha, y = spatial_resolution, color = Sensor)
+) +
+  geom_point(alpha = 0.7, size = 3) +
+  scale_x_log10() +
+  scale_y_log10() +
+  scale_color_brewer(palette = "Set2", drop = FALSE) +
+  labs(
+    x = "Spatial extent (ha)",
+    y = "Spatial resolution (m²)",
+    color = "Sensor Type"
+  ) +
+  theme_minimal() +
+  theme(
+    axis.title = element_text(size = 18),
+    axis.text  = element_text(size = 14),
+    legend.title = element_text(size = 18),
+    legend.text  = element_text(size = 14),
+    axis.title.x = element_text(margin = margin(t = 18)),
+    axis.title.y = element_text(margin = margin(r = 18))
+  )
+
+spatial_scatter
+# ggsave(
+#   filename = "output/spatial_scatterplot.png",
+#   plot = spatial_scatter, width = 8, height = 6, units = "in", dpi = 300)
+```
+
