@@ -494,7 +494,7 @@ spatial_extent_hist_log
 
 #9. extent vs. resolution scatterplot
 
-## working - figure to explore relationship between spatial extent and resolution
+figure to explore relationship between spatial extent and resolution
 
 start with spatial_data_no_ppm
 - convert spatial_extent to hectares as above
