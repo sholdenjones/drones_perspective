@@ -1,0 +1,400 @@
+---
+title: "UAVs in tropical ecology"
+subtitle: "lkw"
+output:
+  html_document:
+    code_folding: hide
+    toc: true
+    toc_float: true
+  word_document:
+    toc: true
+---
+
+```{r setup, include=FALSE}
+is_word <- knitr::is_latex_output() || !is.null(knitr::pandoc_to()) && knitr::pandoc_to() == "docx"
+knitr::opts_chunk$set(
+  echo = !is_word, warning = FALSE, message = FALSE,
+  fig.width = 10, fig.height = 5, dpi = 300
+)
+```
+
+## Setup
+
+```{r packages}
+library(tidyverse)
+library(readxl)
+library(sf)
+library(rnaturalearth)
+library(rnaturalearthdata)
+library(tidygeocoder)
+source(here::here("R/parse_coordinates.R"))
+theme_set(theme_minimal())
+
+sensor_colors <- c(
+  "RGB"                 = "#D4B86A",
+  "Multispectral"       = "#B07BAC",
+  "NIR"                 = "#A8BF8F",
+  "Hyperspectral"       = "#C4956A",
+  "Thermal"             = "#C8C3A0",
+  "LiDAR"               = "#7B96B0",
+  "Atmospheric sampler" = "#5F9EA0"
+)
+```
+
+```{r load-data}
+d_raw <- read_excel(here::here("data/DataExtraction_drone.xlsx"), sheet = "done")
+```
+
+## Data cleaning
+
+```{r clean-data}
+d <- d_raw %>%
+  rename(
+    study_id        = `Study ID`,
+    year            = `Publication year`,
+    country         = `Country of study`,
+    study_site      = `Study site`,
+    sensor_type     = `Sensor Type`,
+    research_topic  = `Research topic`,
+    coord_raw       = `Location coordinates`,
+    coord_clean_raw = `Location coordinates - CLEAN`
+  ) %>%
+  mutate(
+    # Country typos
+    country = recode(country,
+      "Brasil"   = "Brazil",
+      "Cost Rica" = "Costa Rica",
+      "Columbia"  = "Colombia",
+      "Malwai"    = "Malawi",
+      "Equador"   = "Ecuador"
+    ),
+    # Topic typos
+    research_topic = str_replace(research_topic,
+      "Plany physiological performance",
+      "Plant physiological performance"),
+    research_topic = str_replace(research_topic,
+      "Carbon/nutrient fluxes",
+      "Carbon and nutrient fluxes"),
+    # Topic merges/renames
+    research_topic = str_replace(research_topic,
+      "Plant physiological performance",
+      "Plant physiology"),
+    research_topic = str_replace(research_topic,
+      "Forest cover detection",
+      "Forest structure/dynamics"),
+    research_topic = str_replace(research_topic,
+      "Restoration monitoring",
+      "Forest structure/dynamics"),
+    research_topic = str_replace(research_topic,
+      "Plant identification",
+      "Canopy composition"),
+    research_topic = str_replace(research_topic,
+      "Animal ecology",
+      "Animal ecology/detection"),
+    research_topic = str_replace(research_topic,
+      "Animal identification",
+      "Animal ecology/detection")
+  )
+```
+
+### Expand sensor types
+
+```{r expand-sensors}
+d_sensors <- d %>%
+  select(study_id, year, sensor_type) %>%
+  separate_rows(sensor_type, sep = ",") %>%
+  mutate(sensor_type = trimws(sensor_type)) %>%
+  filter(sensor_type != "not reported", !is.na(sensor_type))
+```
+
+### Expand research topics
+
+```{r expand-topics}
+d_topics <- d %>%
+  select(study_id, year, country, research_topic) %>%
+  separate_rows(research_topic, sep = ",") %>%
+  mutate(research_topic = trimws(research_topic)) %>%
+  filter(!is.na(research_topic)) %>%
+  distinct()
+```
+
+## Coordinate cleaning
+
+```{r coord-cleaning, include=FALSE}
+parse_existing_clean <- function(s) {
+  if (is.na(s) || s == "not reported") return(c(lat = NA_real_, lon = NA_real_))
+  parts <- trimws(unlist(strsplit(s, ";")))
+  lats <- lons <- numeric(0)
+  for (p in parts) {
+    vals <- as.numeric(trimws(unlist(strsplit(p, ","))))
+    if (length(vals) == 2 && !any(is.na(vals))) {
+      lats <- c(lats, vals[1])
+      lons <- c(lons, vals[2])
+    }
+  }
+  if (length(lats) == 0) return(c(lat = NA_real_, lon = NA_real_))
+  c(lat = mean(lats), lon = mean(lons))
+}
+
+# Use existing clean coords where available
+existing <- t(sapply(d$coord_clean_raw, parse_existing_clean))
+d$coord_lat <- existing[, 1]
+d$coord_lon <- existing[, 2]
+d$coord_method <- ifelse(!is.na(d$coord_lat), "existing", NA_character_)
+
+# Parse raw coords for missing entries
+needs_coords <- is.na(d$coord_lat)
+if (any(needs_coords)) {
+  parsed <- t(sapply(d$coord_raw[needs_coords], parse_coord_string))
+  got_parsed <- !is.na(parsed[, 1])
+  d$coord_lat[needs_coords][got_parsed] <- parsed[got_parsed, 1]
+  d$coord_lon[needs_coords][got_parsed] <- parsed[got_parsed, 2]
+  d$coord_method[needs_coords][got_parsed] <- "parsed"
+}
+
+# Manual fixes for entries the parser can't handle
+manual_fixes <- tribble(
+  ~study_id, ~lat,     ~lon,
+  4,         6.883,    4.462,
+  56,        19.8459,  109.2465,
+  136,       23.8906,  95.9686
+)
+for (i in seq_len(nrow(manual_fixes))) {
+  idx <- which(d$study_id == manual_fixes$study_id[i])
+  if (length(idx) == 1 && is.na(d$coord_lat[idx])) {
+    d$coord_lat[idx] <- manual_fixes$lat[i]
+    d$coord_lon[idx] <- manual_fixes$lon[i]
+    d$coord_method[idx] <- "manual"
+  }
+}
+
+# Geocode remaining missing using study site + country
+needs_geocode <- is.na(d$coord_lat)
+if (any(needs_geocode)) {
+  to_geocode <- d %>%
+    filter(is.na(coord_lat)) %>%
+    select(study_id, study_site, country) %>%
+    mutate(query = paste(study_site, country, sep = ", "))
+  geocoded <- to_geocode %>%
+    geocode(query, method = "osm", lat = geo_lat, long = geo_lon)
+  for (i in seq_len(nrow(geocoded))) {
+    idx <- which(d$study_id == geocoded$study_id[i])
+    if (length(idx) == 1 && !is.na(geocoded$geo_lat[i])) {
+      d$coord_lat[idx] <- geocoded$geo_lat[i]
+      d$coord_lon[idx] <- geocoded$geo_lon[i]
+      d$coord_method[idx] <- "geocoded"
+    }
+  }
+}
+
+# Country centroid fallback
+needs_centroid <- is.na(d$coord_lat)
+if (any(needs_centroid)) {
+  world_cent <- ne_countries(scale = "medium", returnclass = "sf") %>% st_centroid()
+  centroid_coords <- st_coordinates(world_cent) %>% as_tibble()
+  centroid_lookup <- tibble(name = world_cent$name, X = centroid_coords$X, Y = centroid_coords$Y)
+  for (idx in which(needs_centroid)) {
+    cty_first <- trimws(unlist(strsplit(d$country[idx], "[,;]")))[1]
+    match_row <- centroid_lookup %>%
+      filter(str_detect(name, fixed(cty_first, ignore_case = TRUE)))
+    if (nrow(match_row) == 0) {
+      match_row <- centroid_lookup %>%
+        filter(str_detect(cty_first, fixed(name, ignore_case = TRUE)))
+    }
+    if (nrow(match_row) > 0) {
+      d$coord_lat[idx] <- match_row$Y[1]
+      d$coord_lon[idx] <- match_row$X[1]
+      d$coord_method[idx] <- "centroid"
+    }
+  }
+}
+
+# Validate against country boundaries
+sf_use_s2(FALSE)
+world_valid <- ne_countries(scale = "medium", returnclass = "sf") %>% st_make_valid()
+world_buf <- st_buffer(world_valid, 0.5) %>% st_make_valid()
+d_sf <- d %>%
+  filter(!is.na(coord_lat), !is.na(coord_lon)) %>%
+  st_as_sf(coords = c("coord_lon", "coord_lat"), crs = 4326)
+hits <- st_intersects(d_sf, world_buf)
+d_sf$country_match <- sapply(hits, function(h) {
+  if (length(h) == 0) return(NA_character_)
+  paste(world_buf$name[h], collapse = "; ")
+})
+sf_use_s2(TRUE)
+
+# Flag midpoint coordinates
+d <- d %>%
+  mutate(
+    coord_is_midpoint = str_detect(coord_clean_raw, ";") |
+      str_detect(coord_raw, ";") |
+      str_detect(coord_raw, "-[0-9].*-[0-9].*[NSEW]", negate = FALSE),
+    coord_is_midpoint = replace_na(coord_is_midpoint, FALSE)
+  )
+
+# Export
+d %>%
+  select(study_id, year, country, study_site, sensor_type, research_topic,
+         coord_lat, coord_lon, coord_method, coord_is_midpoint) %>%
+  write_csv(here::here("data/processed/data_cleaned.csv"))
+```
+
+## Figure 1: Sensor type over time
+
+```{r sensor-data}
+# Add (n = X) to sensor labels, using fixed thematic order from sensor_colors
+sensor_totals <- d_sensors %>% count(sensor_type, name = "total")
+sensor_order <- names(sensor_colors)
+sensor_totals <- sensor_totals %>%
+  mutate(sensor_type = factor(sensor_type, levels = sensor_order)) %>%
+  arrange(sensor_type)
+
+sensor_colors_labeled <- setNames(
+  sensor_colors[sensor_totals$sensor_type],
+  paste0(sensor_totals$sensor_type, " (n = ", sensor_totals$total, ")")
+)
+
+sensor_year <- d_sensors %>%
+  count(year, sensor_type) %>%
+  mutate(sensor_type = fct_recode(sensor_type,
+    !!!setNames(
+      as.character(sensor_totals$sensor_type),
+      paste0(sensor_totals$sensor_type, " (n = ", sensor_totals$total, ")")
+    ))) %>%
+  mutate(sensor_type = factor(sensor_type, levels = names(sensor_colors_labeled)))
+```
+
+### Variant 1: Stacked bar (absolute)
+
+```{r fig-sensor-stack, fig.width=8, fig.height=5}
+p_sensor_stack <- ggplot(sensor_year, aes(x = factor(year), y = n, fill = sensor_type)) +
+  geom_bar(stat = "identity", position = position_stack(reverse = TRUE)) +
+  scale_fill_manual(values = sensor_colors_labeled, name = "Sensor type") +
+  guides(fill = guide_legend(reverse = TRUE)) +
+  labs(x = "Year", y = "Number of studies") +
+  theme(axis.text.x = element_text(angle = 45, hjust = 1))
+p_sensor_stack
+```
+
+## Figure 2: Map of study locations
+
+```{r map-setup}
+world_map <- ne_countries(scale = "medium", returnclass = "sf")
+
+d_map <- d %>%
+  filter(!is.na(coord_lat), !is.na(coord_lon)) %>%
+  st_as_sf(coords = c("coord_lon", "coord_lat"), crs = 4326)
+
+d_map_topics <- d %>%
+  filter(!is.na(coord_lat), !is.na(coord_lon)) %>%
+  separate_rows(research_topic, sep = ",") %>%
+  mutate(research_topic = trimws(research_topic)) %>%
+  filter(!is.na(research_topic)) %>%
+  distinct()
+
+# Keep an unlabeled copy for later chunks that need to re-lump
+d_map_topics_raw <- d_map_topics
+
+d_map_topics_lumped <- d_map_topics %>%
+  mutate(topic_group = fct_lump_n(research_topic, n = 6, other_level = "Other"))
+
+# Append (n = X) counts to legend labels, sorted by count descending
+topic_n <- d_map_topics_lumped %>% count(topic_group) %>% arrange(desc(n))
+new_labels <- paste0(topic_n$topic_group, " (n = ", topic_n$n, ")")
+d_map_topics_lumped <- d_map_topics_lumped %>%
+  mutate(topic_group = fct_recode(topic_group,
+    !!!setNames(as.character(topic_n$topic_group), new_labels))) %>%
+  mutate(topic_group = fct_relevel(topic_group, new_labels))
+
+set.seed(42)
+```
+
+### Variant 1: Dot map by topic (lumped)
+
+```{r fig-map-topic-lumped, fig.width=10, fig.height=5}
+# Master palette covering all topics + Other
+topic_colors_base <- c(
+  "Forest structure/dynamics"                = "#3D6B35",
+  "Animal ecology/detection"                 = "#C1602D",
+  "Canopy composition"                       = "#6A5B8A",
+  "Carbon and nutrient fluxes"               = "#2E7D8C",
+  "Plant physiology"                         = "#B8A56A",
+  "Methodological advancement"               = "#6E8B8D",
+  "Phenology"                                = "#B07BAC",
+  "Forest microclimate"                      = "#A45A3E",
+  "Other"                                    = "#A69070"
+)
+topic_colors_lumped <- setNames(
+  topic_colors_base[as.character(topic_n$topic_group)],
+  paste0(topic_n$topic_group, " (n = ", topic_n$n, ")")
+)
+
+p_map_lumped <- ggplot() +
+  geom_sf(data = world_map, fill = "#F5F1EB", color = "grey70", linewidth = 0.2) +
+  geom_hline(yintercept = c(-23.44, 23.44), linetype = "dashed", color = "grey50", linewidth = 0.3) +
+  geom_jitter(
+    data = d_map_topics_lumped,
+    aes(x = coord_lon, y = coord_lat, color = topic_group),
+    width = 2.5, height = 1.5, size = 2, alpha = 0.8
+  ) +
+  scale_color_manual(values = topic_colors_lumped, name = "Research topic") +
+  coord_sf(xlim = c(-120, 160), ylim = c(-35, 35), expand = FALSE) +
+  labs(x = NULL, y = NULL) +
+  theme(legend.position = "bottom", legend.key.size = unit(0.4, "cm"))
+p_map_lumped
+```
+
+**"Other" category:** Phenology, Methodological advancement, Forest microclimate = Other
+
+### SI figure: Faceted mini-maps by topic
+
+```{r fig-map-facet, fig.width=10, fig.height=9}
+# Add (n = X) counts to facet labels, sorted by count descending
+facet_n <- d_map_topics_raw %>% count(research_topic) %>% arrange(desc(n))
+facet_labels <- paste0(facet_n$research_topic, " (n = ", facet_n$n, ")")
+facet_data <- d_map_topics_raw %>%
+  mutate(research_topic = fct_recode(research_topic,
+    !!!setNames(as.character(facet_n$research_topic), facet_labels))) %>%
+  mutate(research_topic = fct_relevel(research_topic, facet_labels))
+
+p_map_facet <- ggplot() +
+  geom_sf(data = world_map, fill = "#F5F1EB", color = "grey70", linewidth = 0.1) +
+  geom_hline(yintercept = c(-23.44, 23.44), linetype = "dashed", color = "grey50", linewidth = 0.2) +
+  geom_jitter(
+    data = facet_data,
+    aes(x = coord_lon, y = coord_lat),
+    width = 2, height = 1.2, size = 1.2, alpha = 0.7, color = "#C1602D"
+  ) +
+  coord_sf(xlim = c(-120, 160), ylim = c(-35, 35), expand = FALSE) +
+  facet_wrap(~ research_topic, ncol = 2) +
+  labs(x = NULL, y = NULL) +
+  theme(
+    strip.text = element_text(size = 8),
+    axis.text = element_blank(),
+    axis.ticks = element_blank()
+  )
+p_map_facet
+```
+
+## Save outputs
+
+```{r save-figures}
+dir.create(here::here("outputs"), showWarnings = FALSE)
+
+ggsave(here::here("outputs/fig_sensor_stack.png"),
+       p_sensor_stack, width = 8, height = 5, dpi = 300)
+ggsave(here::here("outputs/fig_sensor_stack.pdf"),
+       p_sensor_stack, width = 8, height = 5)
+
+ggsave(here::here("outputs/fig_map_topic_lumped.png"),
+       p_map_lumped, width = 10, height = 5, dpi = 300)
+ggsave(here::here("outputs/fig_map_topic_lumped.pdf"),
+       p_map_lumped, width = 10, height = 5)
+
+ggsave(here::here("outputs/fig_map_facet.png"),
+       p_map_facet, width = 10, height = 9, dpi = 300)
+ggsave(here::here("outputs/fig_map_facet.pdf"),
+       p_map_facet, width = 10, height = 9)
+
+cat("Saved 3 figures x 2 formats = 6 files\n")
+```
